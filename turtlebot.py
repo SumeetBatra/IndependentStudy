@@ -12,15 +12,15 @@ class TurtleBot(object):
     def __init__(self):
         rospy.init_node('turtlebot', anonymous=True)
 
-        self.k_linear = 2
-        self.k_angular = 3.0
-        self.dist_thresh = 0.5
+        self.k_linear = 1.0
+        self.k_angular = 10.0
+        self.dist_thresh = 0.2
 
         self.pose = Pose()
         self.rate = rospy.Rate(10)
 
         self.turtle_sub = rospy.Subscriber("/turtle1/pose", Pose, self.callback)
-        self.vel_pub = rospy.Publisher("/turtle1/cmd_vel", Twist, queue_size=10)
+        self.vel_pub = rospy.Publisher("/turtle1/cmd_vel", Twist, queue_size=1)
 
     def callback(self, data):
         self.pose = data
@@ -38,7 +38,7 @@ class TurtleBot(object):
             vel_msg.angular.y = 0
             vel_msg.angular.z = self.k_angular * (atan2(goal_pose.y - self.pose.y, goal_pose.x - self.pose.x) - self.pose.theta)
             self.vel_pub.publish(vel_msg)
-            print(self.dist(goal_pose))
+            print(self.pose)
             self.rate.sleep()
         vel_msg.linear.x = 0
         vel_msg.angular.z = 0
@@ -59,16 +59,25 @@ class TurtleBot(object):
 def main(args):
     turtle1 = TurtleBot()
 
-    #random goal x,y positions
-    goal1 = turtle1.newGoal(7, 7)
-    goal2 = turtle1.newGoal(3, 7)
-    goal3 = turtle1.newGoal(2, 3)
+    #random goal x,y positions. starting pos is (5.54, 5.54)
+    goal1 = turtle1.newGoal(9, 9)
+
+    goal2 = turtle1.newGoal(4, 7)
+    goal3 = turtle1.newGoal(1, 3)
     goal4 = turtle1.newGoal(7, 2)
 
     turtle1.moveToGoal(goal1)
+    print("FINISHED GOAL 1")
+    rospy.sleep(1)
     turtle1.moveToGoal(goal2)
+    print("FINISHED GOAL 2")
+    rospy.sleep(1)
     turtle1.moveToGoal(goal3)
+    print("FINISHED GOAL 3")
+    rospy.sleep(1)
     turtle1.moveToGoal(goal4)
+    print("FINISHED GOAL 4")
+    rospy.sleep(1)
 
     try:
         rospy.spin()

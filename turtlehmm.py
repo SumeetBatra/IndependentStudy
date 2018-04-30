@@ -1,16 +1,17 @@
 from CCHTN import *
+import networkx as nx
+
+class Classifier(object):
+    def __init__(self):
 
 def main():
-    parent_node = '0'
-    activity_ids = ['1','2','3','4']
+    parent_node = 'task_graph'
+    activity_ids = ['goal_1','goal_2','goal_3','goal_4']
 
     TURTLE_CCHTN = CCHTN(parent_node)
     print(TURTLE_CCHTN.get_root_node()) #prints {'uid': '0', 'parent': None, 'skill': '0', 'completed': False, 'skillType': 'skill'}
+    TURTLE_CCHTN.add_chain(activity_ids, TURTLE_CCHTN.get_root_node())
 
-    #Lines below don't work independently or together with code above
-    #TURTLE_CCHTN.add_chain(activity_ids, parent_node) #TypeError: 'str' object does not support item assignment
-    #TURTLE_CCHTN.add_subgraph(parent_node)
-    #TURTLE_CCHTN.add_activity('1', parent_node)
 
 if __name__ == "__main__":
     main()

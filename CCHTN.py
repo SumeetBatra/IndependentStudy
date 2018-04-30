@@ -27,6 +27,7 @@ class CCHTN(object):
     self._default_graph_attrs = {'initiation_nodes': [], 'termination_nodes': [], 'child_ordering': []}
 
     self.add_activity(activity_uid, None, data={'uid': activity_uid, 'skill': activity_name})
+    
 
   '''
   Saving / Loading / Serialization functions
@@ -205,7 +206,7 @@ class CCHTN(object):
 
     if self._root_uid in self._graph.node:
       parent_node = self._graph.node[self._root_uid] # Default parent node is (self._root_uid)
-   
+
     if parent_activity_id is not None:
       parent_node = self.get_node(parent_activity_id)
       if parent_node is None: raise Exception('No activity with uid %s in graph to append a new activity within.' % parent_activity_id)
@@ -463,7 +464,7 @@ class CCHTN(object):
       # Remove metanode from flat_graph
       flat_graph.remove_node(graph_node_uid)
 
-    flat_graph_head_node = {'uid': head_node['uid'], 'graph': flat_graph, 'initiation_nodes': flat_initiation_nodes, 
+    flat_graph_head_node = {'uid': head_node['uid'], 'graph': flat_graph, 'initiation_nodes': flat_initiation_nodes,
                             'termination_nodes': flat_termination_nodes}
 
     CCHTN.get_graph_completion_status(flat_graph_head_node)
@@ -483,7 +484,7 @@ class CCHTN(object):
   def get_future_activities(activity_uid, head_node, max_look_ahead=1,\
           completed_node_uids=None):
     '''
-    Returns a list of (steps_ahead, node) tuples up to max_look_ahead steps 
+    Returns a list of (steps_ahead, node) tuples up to max_look_ahead steps
     into the future from activity_uid
     '''
     if activity_uid is None\
@@ -815,4 +816,3 @@ class CCHTN(object):
         open_list.extend([subgraph.node[nodeuid] for nodeuid in subgraph.nodes()])
 
     return completed_list
-

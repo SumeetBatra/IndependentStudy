@@ -5,6 +5,7 @@ import networkx as nx
 import roslib
 import rospy
 import numpy as np
+import scipy
 from geometry_msgs.msg import Twist
 from turtlesim.msg import Pose
 from math import pow, atan2, sqrt
@@ -58,6 +59,13 @@ class TurtleBot(object):
         goal.y = y_pose
         return goal
 
+    def classify(self, goal_pos):
+        angular_error = abs((atan2(goal_pos.y - self.pos.y, goal_pos.x - self.pos.x) - self.pose.theta))
+        dist_error = self.dist(goal_pose)
+        #sigmoid squash function
+        score = scipy.special.expit((2*angular_error + dist_error))
+        return score 
+
 
 def main():
     parent_node = 'task_graph'
@@ -67,7 +75,6 @@ def main():
     TURTLE_CCHTN = CCHTN(parent_node)
     print(TURTLE_CCHTN.get_root_node()) #prints {'uid': '0', 'parent': None, 'skill': '0', 'completed': False, 'skillType': 'skill'}
     TURTLE_CCHTN.add_chain(goal_ids, TURTLE_CCHTN.get_root_node(), data=goal_poses)
-
 
 if __name__ == "__main__":
     main()

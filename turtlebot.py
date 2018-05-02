@@ -10,7 +10,7 @@ from math import pow, atan2, sqrt
 class TurtleBot(object):
 
     def __init__(self):
-        rospy.init_node('turtlebot', anonymous=True)
+        rospy.init_node('turtlebot', anonymous=False)
 
         self.k_linear = 1.0
         self.k_angular = 10.0
@@ -56,12 +56,12 @@ class TurtleBot(object):
         goal.y = y_pose
         return goal
 
+
 def main(args):
     turtle1 = TurtleBot()
 
     #random goal x,y positions. starting pos is (5.54, 5.54)
     goal1 = turtle1.newGoal(9, 9)
-
     goal2 = turtle1.newGoal(4, 7)
     goal3 = turtle1.newGoal(1, 3)
     goal4 = turtle1.newGoal(7, 2)

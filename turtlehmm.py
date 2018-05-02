@@ -10,61 +10,33 @@ from geometry_msgs.msg import Twist
 from turtlesim.msg import Pose
 from math import pow, atan2, sqrt
 
-
-class TurtleBot(object):
+class TurtleHMM(object):
     def __init__(self):
-        rospy.init_node('turtlebot', anonymous=False)
-
-        self.k_linear = 1.0
-        self.k_angular = 10.0
-        self.dist_thresh = 0.2
-
-        self.pose = Pose()
-        self.rate = rospy.Rate(10)
+        rospy.init_node('hmm', anonymous=False)
 
         self.turtle_sub = rospy.Subscriber("/turtle1/pose", Pose, self.callback)
-        self.vel_pub = rospy.Publisher("/turtle1/cmd_vel", Twist, queue_size=1)
+
+        self.pos = Pose()
 
     def callback(self, data):
-        self.pose = data
+        self.pos = data
 
-
-    def moveToGoal(self, goal_pose):
-        while self.dist(goal_pose) >= self.dist_thresh:
-            vel_msg = Twist()
-            #linear velocity
-            vel_msg.linear.x = self.k_linear * self.dist(goal_pose)
-            vel_msg.linear.y = 0
-            vel_msg.linear.z = 0
-            #angular velocity
-            vel_msg.angular.x = 0
-            vel_msg.angular.y = 0
-            vel_msg.angular.z = self.k_angular * (atan2(goal_pose.y - self.pose.y, goal_pose.x - self.pose.x) - self.pose.theta)
-            self.vel_pub.publish(vel_msg)
-            print(self.pose)
-            self.rate.sleep()
-        vel_msg.linear.x = 0
-        vel_msg.angular.z = 0
-        self.vel_pub.publish(vel_msg)
-
+    def classify(self, goal_pos):
+        angular_error = abs((atan2(goal_pos.y - self.pos.y, goal_pos.x - self.pos.x) - self.pos.theta))
+        dist_error = self.dist(goal_pose)
+        score = 1 / (2 * angular_error + dist_error)
+        #sigmoid squash b/w 0 and 1
+        p = scipy.special.expit(score)
+        return p
 
     def dist(self, goal_pose):
         #distance = np.sqrt( (goal_pose.x - self.pose.x)**2 + (goal_pose.y - self.pose.y)**2 )
         distance = sqrt( pow(goal_pose.x - self.pose.x, 2) + pow(goal_pose.y - self.pose.y, 2) )
         return distance
 
-    def newGoal(self, x_pose, y_pose):
-        goal = Pose()
-        goal.x = x_pose
-        goal.y = y_pose
-        return goal
 
-    def classify(self, goal_pos):
-        angular_error = abs((atan2(goal_pos.y - self.pos.y, goal_pos.x - self.pos.x) - self.pose.theta))
-        dist_error = self.dist(goal_pose)
-        #sigmoid squash function
-        score = scipy.special.expit((2*angular_error + dist_error))
-        return score 
+
+
 
 
 def main():
